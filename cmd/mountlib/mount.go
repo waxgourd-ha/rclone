@@ -298,12 +298,47 @@ func (m *MountPoint) Mount() (mountDaemon *os.Process, err error) {
 
 	m.VFS = vfs.New(m.Fs, &m.VFSOpt)
 
+	err = checkMountPoint(m.MountPoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check mountpoint: %w", err)
+	}
 	m.ErrChan, m.UnmountFn, err = m.MountFn(m.VFS, m.MountPoint, &m.MountOpt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to mount FUSE fs: %w", err)
 	}
 	m.MountedOn = time.Now()
 	return nil, nil
+}
+func checkMountPoint(mountpoint string) error {
+	fs.Debugf(mountpoint, "Checking for mountpoint")
+	excludePointMap := map[string]string{
+		"/homeassistant_config": "",
+		"/addon_config":         "",
+		"/ssl":                  "",
+		"/share":                "",
+		"/addons":               "",
+		"/backup":               "",
+		"/media":                "",
+		"/all_addon_configs":    "",
+	}
+	if mountpoint == "" {
+		return fmt.Errorf("mountpoint is not specified")
+	}
+	if _, ok := excludePointMap[mountpoint]; ok {
+		return fmt.Errorf("mountpoint %s does not allow to mount", mountpoint)
+	}
+	// Check if the mountpoint exists
+	if _, err := os.Stat(mountpoint); err != nil {
+		// If the mountpoint doesn't exist, try to create it
+		if os.IsNotExist(err) {
+			fs.Debugf(mountpoint, "Creating mountpoint")
+			err = os.MkdirAll(mountpoint, 0777)
+			if err != nil {
+				return fmt.Errorf("failed to create mountpoint %s: %w", mountpoint, err)
+			}
+		}
+	}
+	return nil
 }
 
 // Wait for mount end
