@@ -320,6 +320,7 @@ func checkMountPoint(mountpoint string) error {
 		"/backup":               "",
 		"/media":                "",
 		"/all_addon_configs":    "",
+		"/data":                 "",
 	}
 	if mountpoint == "" {
 		return fmt.Errorf("mountpoint is not specified")
