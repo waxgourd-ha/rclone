@@ -6,7 +6,7 @@ on:
         - master
 jobs:
     build:
-        if: github.repository == 'rclone/rclone'
+        if: github.repository == 'waxgourd-ha/rclone'
         runs-on: ubuntu-latest
         name: Build image job
         steps:
