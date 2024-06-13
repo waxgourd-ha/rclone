@@ -6,7 +6,7 @@ on:
 
 jobs:
     build:
-        if: github.repository == 'rclone/rclone'
+        if: github.repository == 'waxgourd-ha/rclone'
         runs-on: ubuntu-latest
         name: Build image job
         steps:
@@ -43,7 +43,7 @@ jobs:
                 dockerHubPassword: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
     build_docker_volume_plugin:
-        if: github.repository == 'rclone/rclone'
+        if: github.repository == 'waxgourd-ha/rclone'
         needs: build
         runs-on: ubuntu-latest
         name: Build docker plugin job
